@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Private Academy
-// Versão: 7.8 (Claude Haiku 4.5 - linguagem humanizada anti-manual)
+// Versão: 7.9 (Claude Haiku 4.5 - Funil 2 aceita "compartilhamento")
 // ============================================
 
 import express from "express";
@@ -806,7 +806,7 @@ app.post("/chat", async (req, res) => {
     let infoFunil = "";
     if (funil_origem === "recuperacao_banca") {
       infoFunil = "\n\n========== ⚠️ CONTEXTO OBRIGATÓRIO DESTA CONVERSA ⚠️ ==========\nEste cliente VEIO PELO FUNIL 1 (Método Recuperação de Banca) — JÁ FOI MARCADO no nosso sistema.\n\nREGRAS ABSOLUTAS:\n1. ❌ PROIBIDO perguntar 'você veio pelo Recuperação de Banca ou Compartilhamento de Receita?' — você JÁ SABE que é Recuperação de Banca.\n2. ❌ PROIBIDO oferecer ou mencionar o Funil 2 (Compartilhamento de Receita / Alavancagem) — esse cliente NÃO VEIO POR ESSE FUNIL.\n3. ✅ FOCO ABSOLUTO em Recuperação de Banca (com Bruno) desde a primeira mensagem.\n4. ✅ Se o cliente apenas disser o nome dele (ex: 'roberto'), responda saudando e fazendo a 1ª pergunta de qualificação SOBRE RECUPERAÇÃO (tempo de mercado, modalidade), JAMAIS perguntando qual funil.\n\nIGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.\n=================================================================";
-    } else if (funil_origem === "alavancagem" || funil_origem === "compartilhamento_receita") {
+    } else if (funil_origem === "alavancagem" || funil_origem === "compartilhamento") {
       infoFunil = "\n\n========== ⚠️ CONTEXTO OBRIGATÓRIO DESTA CONVERSA ⚠️ ==========\nEste cliente VEIO PELO FUNIL 2 (Compartilhamento de Receita / Alavancagem de Capital) — JÁ FOI MARCADO no nosso sistema.\n\nREGRAS ABSOLUTAS:\n1. ❌ PROIBIDO perguntar 'você veio pelo Recuperação de Banca ou Compartilhamento de Receita?' — você JÁ SABE que é Alavancagem.\n2. ❌ PROIBIDO oferecer ou mencionar o Funil 1 (Recuperação de Banca) — esse cliente NÃO VEIO POR ESSE FUNIL.\n3. ✅ FOCO ABSOLUTO em Alavancagem (com Igor) desde a primeira mensagem.\n4. ✅ Se o cliente apenas disser o nome dele, responda saudando e fazendo a 1ª pergunta de qualificação SOBRE ALAVANCAGEM (experiência no mercado), JAMAIS perguntando qual funil.\n\nIGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.\n=================================================================";
     }
 
@@ -933,7 +933,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Private Academy",
-    versao: "7.8 (Claude Haiku 4.5 - linguagem humanizada anti-manual)",
+    versao: `7.9 (Claude Haiku 4.5 - Funil 2 aceita "compartilhamento")`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -958,5 +958,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 7.8: Claude Haiku 4.5 - linguagem humanizada anti-manual`);
+  console.log(`🆕 Versão 7.9: Claude Haiku 4.5 - Funil 2 aceita "compartilhamento"`);
 });
