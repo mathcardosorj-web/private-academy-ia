@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Private Academy
-// Versão: 7.6 (Claude Haiku 4.5 - link na hora + transferência reduzida)
+// Versão: 7.7 (Claude Haiku 4.5 - link imediato + número de teste)
 // ============================================
 
 import express from "express";
@@ -28,6 +28,22 @@ const EXPIRACAO_MS = 30 * 60 * 1000;
 const RATE_LIMIT_MAX = 30;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const rateLimitClientes = new Map();
+
+// ============================================
+// NÚMEROS DE TESTE
+// ============================================
+// Números que a IA reconhece como teste interno (responde normal,
+// mas marca contexto como teste para fins de logging/análise)
+const NUMEROS_TESTE = [
+  "+5521982702857", // Matheus Cardoso (dev)
+];
+
+function ehNumeroTeste(clienteId) {
+  if (!clienteId) return false;
+  // Normaliza removendo espaços/caracteres extras
+  const normalizado = clienteId.replace(/\s+/g, "").trim();
+  return NUMEROS_TESTE.includes(normalizado);
+}
 
 // ============================================
 // CONFIG DO DELAY
@@ -724,6 +740,12 @@ app.post("/chat", async (req, res) => {
       console.log(`[${new Date().toISOString()}] >>> Funil de origem: ${funil_origem}`);
     }
 
+    // Detecta se é número de teste (loga e marca pro prompt)
+    const ehTeste = ehNumeroTeste(cliente_id);
+    if (ehTeste) {
+      console.log(`[${new Date().toISOString()}] 🧪 NÚMERO DE TESTE DETECTADO`);
+    }
+
     // CACHE DE SAUDAÇÃO (economia de tokens!)
     if (detectarSaudacao(mensagem)) {
       console.log(`[${new Date().toISOString()}] >>> CACHE: saudação detectada, sem chamada à IA`);
@@ -762,9 +784,14 @@ app.post("/chat", async (req, res) => {
       infoFunil = "\n\n========== ⚠️ CONTEXTO OBRIGATÓRIO DESTA CONVERSA ⚠️ ==========\nEste cliente VEIO PELO FUNIL 2 (Compartilhamento de Receita / Alavancagem de Capital) — JÁ FOI MARCADO no nosso sistema.\n\nREGRAS ABSOLUTAS:\n1. ❌ PROIBIDO perguntar 'você veio pelo Recuperação de Banca ou Compartilhamento de Receita?' — você JÁ SABE que é Alavancagem.\n2. ❌ PROIBIDO oferecer ou mencionar o Funil 1 (Recuperação de Banca) — esse cliente NÃO VEIO POR ESSE FUNIL.\n3. ✅ FOCO ABSOLUTO em Alavancagem (com Igor) desde a primeira mensagem.\n4. ✅ Se o cliente apenas disser o nome dele, responda saudando e fazendo a 1ª pergunta de qualificação SOBRE ALAVANCAGEM (experiência no mercado), JAMAIS perguntando qual funil.\n\nIGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.\n=================================================================";
     }
 
+    // Marca contexto de teste no prompt (IA responde normal, mas sabe que é teste)
+    const infoTeste = ehTeste
+      ? "\n\n========== 🧪 CONTEXTO DE TESTE ==========\nEste cliente é um NÚMERO DE TESTE INTERNO da equipe da Private Academy. Responda EXATAMENTE como responderia a um cliente real — mesmo tom, mesmo roteiro, mesmas regras. Não mencione que é teste, não quebre o personagem. A diferença é só interna (logging/análise).\n=============================================="
+      : "";
+
     const systemPromptPersonalizado = nome_cliente
-      ? `${SYSTEM_PROMPT}\n\nNome do cliente: ${nome_cliente} (NÃO confunda com seu nome Matheus)${infoFunil}`
-      : `${SYSTEM_PROMPT}${infoFunil}`;
+      ? `${SYSTEM_PROMPT}\n\nNome do cliente: ${nome_cliente} (NÃO confunda com seu nome Matheus)${infoFunil}${infoTeste}`
+      : `${SYSTEM_PROMPT}${infoFunil}${infoTeste}`;
 
     // Anthropic: system fica separado, messages só tem user/assistant
     const mensagensConversa = historico.mensagens.slice(-LIMITE_HISTORICO);
@@ -880,7 +907,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Private Academy",
-    versao: "7.6 (Claude Haiku 4.5 - link na hora + transferência reduzida)",
+    versao: "7.7 (Claude Haiku 4.5 - link imediato + número de teste)",
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -905,5 +932,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 7.6: Claude Haiku 4.5 - link na hora + transferência reduzida`);
+  console.log(`🆕 Versão 7.7: Claude Haiku 4.5 - link imediato + número de teste`);
 });
