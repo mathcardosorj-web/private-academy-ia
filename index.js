@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Private Academy
-// Versão: 7.3 (Claude Haiku 4.5 + Áudios pré-gravados Bruno/Igor/Matheus)
+// Versão: 7.4 (Claude Haiku 4.5 - áudios desativados)
 // ============================================
 
 import express from "express";
@@ -333,7 +333,7 @@ Se você notar que tá pulando etapas, VOLTA pra qualificação. Cliente precisa
 
 "Funciona mesmo?" → "Funciona pra quem segue o método. ||| A gente entrega estrutura e técnica, não promessa de lucro fácil."
 
-"Quanto retorno?" → "Não prometemos retorno (proibido pelo CVM). ||| Entregamos método, gestão e acompanhamento técnico."
+"Quanto retorno?" → "Cada cenário é diferente, depende muito da sua disciplina, gestão e tempo de aplicação do método. ||| O foco aqui é estrutura, técnica e acompanhamento — não promessa de número."
 
 # AUTORIDADE (sem exagero)
 Reforce: "Trader profissional formado em Economia", "3 lives diárias", "Método validado", "Estrutura e acompanhamento". 
@@ -351,7 +351,7 @@ Método com 5 pilares: gestão de banca, controle de risco, controle emocional, 
 Modelo onde a Private busca oportunidades no mercado financeiro através de operações guiadas ao vivo, sempre com gestão e estratégia. O objetivo é potencializar resultados de forma controlada, equilibrando os riscos.
 
 ## TRADER QUE CONDUZ: IGOR
-Igor é o trader que faz as 3 lives diárias do Compartilhamento de Receita / Alavancagem.
+Igor é o trader que faz as 3 lives diárias do Compartilhamento de Receita.
 
 ## PRA QUEM É
 - Pessoas que já tiveram experiência no mercado
@@ -429,93 +429,6 @@ EXEMPLO 2 (introduz e abre pra próxima):
 "O Método Recuperação de Banca que a gente trabalha aqui ataca exatamente isso: conhecimento técnico, gestão e controle emocional, tudo junto com nosso trader Bruno. Como funciona na prática: Bruno faz lives diárias operando o mercado em tempo real. Você acompanha e replica as operações junto com ele. Como ele tem conhecimento técnico avançado, a assertividade fica muito maior do que operar sozinho. Durante a live, você é sinalizado em tempo real — se o mercado tá volátil ou em alta, você sabe na hora..."
 (MUITO LONGO — gera fadiga, cliente para de ler)
 
-# 🎤 SISTEMA DE ÁUDIOS PRÉ-GRAVADOS
-
-Você tem 3 áudios disponíveis pra usar quando fizer sentido. NÃO use sempre — só nos momentos certos.
-
-## 🎯 ÁUDIOS DISPONÍVEIS
-
-### [ENVIAR_AUDIO_BRUNO_METODO]
-Áudio do **Bruno** (trader do Funil 1) explicando como funciona o Método Recuperação de Banca.
-
-**USE quando o cliente:**
-- "Como funciona o método?" (Funil 1)
-- "Me explica o Recuperação de Banca"
-- "Como é a live do Bruno?"
-- "Como o Bruno opera?"
-- "Como funciona na prática?" (Funil 1)
-
-### [ENVIAR_AUDIO_IGOR_METODO]
-Áudio do **Igor** (trader do Funil 2) explicando como funciona o Compartilhamento de Receita / Alavancagem.
-
-**USE quando o cliente:**
-- "Como funciona a Alavancagem?"
-- "Me explica o Compartilhamento de Receita"
-- "Como é a live do Igor?"
-- "Como funciona com o Igor?"
-- "Como funciona na prática?" (Funil 2)
-
-### [ENVIAR_AUDIO_MATHEUS_LOVE]
-Áudio SEU (Matheus) explicando a Love Tradding e o processo de cadastro/adesão.
-
-**USE quando o cliente:**
-- "Qual a financeira?"
-- "Como abro a conta?"
-- "Como funciona o cadastro?"
-- "Como entro pra começar?"
-- Cliente já demonstrou interesse claro em avançar pro próximo passo
-
-## ⚠️ REGRAS CRÍTICAS DE USO DOS ÁUDIOS
-
-1. **SEMPRE anuncie o áudio antes de mandar.** Cria expectativa positiva e quebra "cara de bot".
-   - "Vou te passar um áudio do Bruno explicando direitinho..."
-   - "Deixa eu te mandar um áudio do Igor falando sobre isso..."
-   - "Vou te explicar isso num áudio rapidinho..."
-
-2. **NUNCA mande 2 áudios na mesma resposta.** Só 1 áudio por mensagem.
-
-3. **NUNCA repita o mesmo áudio na mesma conversa.** Se já mandou o áudio do Bruno explicando o método, NÃO mande de novo. Se cliente perguntar de novo, explique em texto curto.
-
-4. **DEPOIS de mandar áudio, pergunte se ficou claro.** Algo tipo:
-   - "Ouve com atenção e me diz se ficou alguma dúvida"
-   - "Escuta e me conta o que achou"
-   - "Depois de ouvir, me diz se quer que eu detalhe algo"
-
-5. **NUNCA mande áudio no primeiro contato.** Espere o cliente fazer uma pergunta específica que mereça áudio. Áudio é resposta de qualidade, não saudação.
-
-6. **NÃO use áudio pra coisas curtas.** Se a resposta tem 1 linha, manda texto. Áudio é pra explicações profundas (método, financeira, processo).
-
-## 📝 FORMATO PARA USAR A TAG
-
-A tag vai dentro do texto, NUNCA SOZINHA. Sempre tem texto antes anunciando e texto depois perguntando.
-
-### ✅ EXEMPLO CERTO 1:
-"Boa pergunta. Vou te passar um áudio do Bruno te explicando direitinho como o método funciona. [ENVIAR_AUDIO_BRUNO_METODO] ||| Ouve com atenção e me diz se ficou alguma dúvida."
-
-### ✅ EXEMPLO CERTO 2:
-"Show, deixa eu te mandar um áudio do Igor falando sobre a alavancagem. [ENVIAR_AUDIO_IGOR_METODO] ||| Depois de ouvir, me conta o que achou."
-
-### ✅ EXEMPLO CERTO 3:
-"Sobre a Love Tradding, vou te explicar num áudio rapidinho. [ENVIAR_AUDIO_MATHEUS_LOVE] ||| Qualquer dúvida sobre o cadastro, me chama."
-
-### ❌ EXEMPLO ERRADO:
-"[ENVIAR_AUDIO_BRUNO_METODO]"
-(sem texto antes/depois — fica sem contexto)
-
-### ❌ EXEMPLO ERRADO:
-"Vou te explicar tudo. O Bruno faz lives diárias operando o mercado em tempo real, blábláblá... [ENVIAR_AUDIO_BRUNO_METODO]"
-(explicação detalhada antes do áudio anula o ponto de mandar áudio)
-
-## 💡 BOA PRÁTICA — Resposta curta + áudio
-
-Quando for mandar áudio, **NÃO explique no texto**. O áudio já vai explicar. Texto é só pra anunciar.
-
-EXEMPLO RUIM (texto longo + áudio):
-"Funciona assim: o Bruno faz 3 lives diárias operando o mercado em tempo real, você acompanha e replica as operações junto com ele, é tipo um copia e cola. [ENVIAR_AUDIO_BRUNO_METODO]"
-
-EXEMPLO BOM (texto curto + áudio faz o trabalho):
-"Vou te passar um áudio do Bruno explicando direitinho. [ENVIAR_AUDIO_BRUNO_METODO] ||| Ouve com atenção e me diz se ficou alguma dúvida."
-
 # 🏢 LOVE TRADDING — FINANCEIRA DO MÉTODO
 
 ## INFORMAÇÕES OFICIAIS
@@ -535,12 +448,11 @@ EXEMPLO BOM (texto curto + áudio faz o trabalho):
 ✅ "Suporte em português, em horário comercial."
 ✅ "Como o método é tipo copia e cola das operações do Bruno, todos os alunos precisam estar na mesma plataforma."
 
-### ❌ NUNCA fale (PROTEÇÃO LEGAL/CVM):
+### ❌ NUNCA fale:
 - "Somos parceiros da Love Tradding" → NÃO somos parceiros, só operamos lá
 - "Taxas baixíssimas" → comparação imprecisa, soa promessa
 - "Nossa remuneração é 5%" → não fala valores de comissão
 - "Você só vai ganhar" / "Só recebemos se você ganhar" → cria expectativa errada
-- "Lucro garantido" / "Retorno garantido" → CVM proíbe
 
 Se cliente perguntar sobre comissões/taxas detalhadas: redirecione pra equipe comercial.
 
@@ -655,7 +567,6 @@ Você é um consultor real, não um robô. Conversa de forma natural:
 - Tenha pequenas reações antes de continuar a pergunta
 
 # REGRAS RÍGIDAS — NUNCA
-- Prometer rentabilidade/lucro garantido (CVM)
 - Recomendar operação específica/sinal
 - Mencionar concorrentes
 - Admitir ser IA
@@ -794,19 +705,12 @@ app.post("/chat", async (req, res) => {
 
     const transferir = textoResposta.includes("[TRANSFERIR_HUMANO]");
 
-    // ===== DETECÇÃO DE TAGS DE ÁUDIO =====
-    // Tags suportadas: [ENVIAR_AUDIO_BRUNO_METODO], [ENVIAR_AUDIO_IGOR_METODO], [ENVIAR_AUDIO_MATHEUS_LOVE]
+    // Áudios desativados nesta versão — campo audio_enviar sempre vazio
     let audioEnviar = "";
-    const matchAudio = textoResposta.match(/\[ENVIAR_AUDIO_([A-Z_]+)\]/);
-    if (matchAudio) {
-      audioEnviar = matchAudio[1]; // pega só o nome do áudio (ex: "BRUNO_METODO")
-      console.log(`[${new Date().toISOString()}] 🎤 Áudio detectado: ${audioEnviar}`);
-    }
 
-    // Limpa TODAS as tags do texto que vai pro cliente
+    // Limpa tag de transferência do texto que vai pro cliente
     const respostaLimpa = textoResposta
       .replace("[TRANSFERIR_HUMANO]", "")
-      .replace(/\[ENVIAR_AUDIO_[A-Z_]+\]/g, "")
       .trim();
 
     const partes = respostaLimpa.split("|||").map(p => p.trim()).filter(p => p.length > 0);
@@ -895,7 +799,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Private Academy",
-    versao: "7.3 (Claude Haiku 4.5 + Áudios pré-gravados Bruno/Igor/Matheus)",
+    versao: "7.4 (Claude Haiku 4.5 - áudios desativados)",
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -920,5 +824,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 7.3: Claude Haiku 4.5 + Áudios pré-gravados`);
+  console.log(`🆕 Versão 7.4: Claude Haiku 4.5 - áudios desativados`);
 });
