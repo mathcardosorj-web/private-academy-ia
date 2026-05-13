@@ -1,0 +1,20 @@
+{
+  "name": "api-cabeca-botconversa",
+  "version": "7.3.0",
+  "description": "API com IA Matheus para Private Academy (BotConversa + Claude Haiku 4.5 + Áudios pré-gravados)",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "openai": "^4.67.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
