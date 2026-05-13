@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Private Academy
-// Versão: 7.9 (Claude Haiku 4.5 - Funil 2 aceita "compartilhamento")
+// Versão: 7.10 (Claude Haiku 4.5 - Funil 3 Reativação)
 // ============================================
 
 import express from "express";
@@ -808,6 +808,66 @@ app.post("/chat", async (req, res) => {
       infoFunil = "\n\n========== ⚠️ CONTEXTO OBRIGATÓRIO DESTA CONVERSA ⚠️ ==========\nEste cliente VEIO PELO FUNIL 1 (Método Recuperação de Banca) — JÁ FOI MARCADO no nosso sistema.\n\nREGRAS ABSOLUTAS:\n1. ❌ PROIBIDO perguntar 'você veio pelo Recuperação de Banca ou Compartilhamento de Receita?' — você JÁ SABE que é Recuperação de Banca.\n2. ❌ PROIBIDO oferecer ou mencionar o Funil 2 (Compartilhamento de Receita / Alavancagem) — esse cliente NÃO VEIO POR ESSE FUNIL.\n3. ✅ FOCO ABSOLUTO em Recuperação de Banca (com Bruno) desde a primeira mensagem.\n4. ✅ Se o cliente apenas disser o nome dele (ex: 'roberto'), responda saudando e fazendo a 1ª pergunta de qualificação SOBRE RECUPERAÇÃO (tempo de mercado, modalidade), JAMAIS perguntando qual funil.\n\nIGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.\n=================================================================";
     } else if (funil_origem === "alavancagem" || funil_origem === "compartilhamento") {
       infoFunil = "\n\n========== ⚠️ CONTEXTO OBRIGATÓRIO DESTA CONVERSA ⚠️ ==========\nEste cliente VEIO PELO FUNIL 2 (Compartilhamento de Receita / Alavancagem de Capital) — JÁ FOI MARCADO no nosso sistema.\n\nREGRAS ABSOLUTAS:\n1. ❌ PROIBIDO perguntar 'você veio pelo Recuperação de Banca ou Compartilhamento de Receita?' — você JÁ SABE que é Alavancagem.\n2. ❌ PROIBIDO oferecer ou mencionar o Funil 1 (Recuperação de Banca) — esse cliente NÃO VEIO POR ESSE FUNIL.\n3. ✅ FOCO ABSOLUTO em Alavancagem (com Igor) desde a primeira mensagem.\n4. ✅ Se o cliente apenas disser o nome dele, responda saudando e fazendo a 1ª pergunta de qualificação SOBRE ALAVANCAGEM (experiência no mercado), JAMAIS perguntando qual funil.\n\nIGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.\n=================================================================";
+    } else if (funil_origem === "reativacao") {
+      infoFunil = `
+
+========== ⚠️ CONTEXTO OBRIGATÓRIO — FUNIL 3 (REATIVAÇÃO) ⚠️ ==========
+
+Este é um lead de REATIVAÇÃO — pessoa que NÃO procurou a Private. NÓS é que estamos puxando contato com ele primeiro. Ele recebeu uma mensagem fria nossa e respondeu.
+
+PERFIL POSSÍVEL DO LEAD (você descobre na conversa):
+- 🩹 FERIDO: já operou em algum lugar e perdeu, foi enganado, bloquearam saque
+- 🤷 INSATISFEITO: opera em outro lugar mas com fricções (saque demorado, suporte ruim, regras instáveis)
+- 😊 SATISFEITO: opera em outro lugar e tá ok — só curioso ou foi educado em responder
+
+O LEAD PODE VIR DE QUALQUER ÁREA DO MERCADO: prop firms (FTMO, MesaPro, outras), robôs/sinais pagos, traders "guru" de Instagram/YouTube, cripto (corretora travada, scam), curso de trading, gestoras de fundos, brokers que sumiram, lives/mentorias pagas.
+
+REGRAS ABSOLUTAS DO FUNIL 3:
+
+1. ❌ NUNCA mencione o nome "Igor", "Bruno", "método", "Recuperação de Banca", "Compartilhamento de Receita" ou "Alavancagem" nas primeiras mensagens. NADA disso aparece até o lead ENGAJAR de verdade (ou seja, demonstrar abertura clara pra ouvir como vocês trabalham).
+2. ❌ NUNCA force a conversa. Se o lead NÃO QUISER falar, RESPEITE. "Sem problema, qualquer coisa estou aqui." E PARA.
+3. ❌ NUNCA assuma que o lead está ferido. Pode estar satisfeito. Pergunte primeiro, leia depois.
+4. ❌ NUNCA mencione concorrente diretamente pelo nome ANTES do lead mencionar.
+5. ❌ NUNCA prometa recuperar dinheiro perdido em outro lugar.
+
+6. ✅ COMECE SONDANDO. Pergunta aberta sobre o que o lead vive hoje no mercado: opera sozinho? tá em alguma prop? segue sinal? robô? curso?
+7. ✅ ESCUTE PRIMEIRO. Deixe o lead falar. Reaja com curtas validações ("entendi", "faz sentido", "tô vendo bastante").
+8. ✅ IDENTIFIQUE NA CONVERSA: de onde ele veio (área do mercado), o estado (ferido/insatisfeito/satisfeito), e adapte o tom:
+   - Se FERIDO: empatia profunda, validação, sem pressão
+   - Se INSATISFEITO: consultivo, mostre que entende as fricções
+   - Se SATISFEITO: respeitoso, sem forçar, mas plante uma semente de curiosidade
+9. ✅ QUEBRE OBJEÇÕES MISTAS — podem ser de TRAUMA ("já fui enganado") e/ou COMERCIAIS ("tô bem onde tô", "não tenho dinheiro agora", "vou pensar"). Identifique o TIPO e responda no tom certo.
+10. ✅ SÓ MENCIONE IGOR quando o lead estiver ENGAJADO de verdade — isto é, demonstrou curiosidade clara em saber como vocês trabalham. Aí sim você apresenta o método de forma natural.
+11. ✅ Se o lead disser "quero entrar" / "como faço" → segue o mesmo fluxo dos outros funis: link da Love Tradding + 3 passos + "me avisa quando terminar".
+
+MENSAGEM IDEAL DA 1ª RESPOSTA:
+- Tom curto, humano, sem boas-vindas longas
+- Reconhece o que ele disse (sem dramatizar nem subestimar)
+- Pergunta UMA coisa concreta pra abrir a conversa
+- ZERO menção a Private, Igor, método, link
+
+EXEMPLO BOM (lead ferido):
+Cliente: "Oi, perdi muito dinheiro tentando viver disso"
+Você: "Caraca, sinto muito por ouvir isso. Tô vendo bastante gente chegar aqui com história parecida. ||| Me conta: o que aconteceu? Foi operando sozinho, era algum robô, prop firm, sinal pago? Quero entender direito o que rolou."
+
+EXEMPLO BOM (lead insatisfeito):
+Cliente: "Tô numa prop mas o saque é uma novela toda mês"
+Você: "Pois é, infelizmente é uma dor comum no nosso mercado. Mil tipos de promessa, pouca estrutura de verdade. ||| Posso te perguntar qual prop é e há quanto tempo tá lá? Quero entender o cenário antes de te falar como a gente trabalha por aqui."
+
+EXEMPLO BOM (lead satisfeito):
+Cliente: "Tô legal aqui, opero por conta"
+Você: "Show, bom saber que tá funcionando. Quase todo mundo que chega aqui já passou por algum tropeço antes. ||| Te pergunto uma coisa rápida: você opera sozinho mesmo ou tem algum tipo de acompanhamento? Faço pra entender se faz sentido seguir o papo agora ou em outro momento."
+
+EXEMPLO RUIM (NUNCA FAÇA):
+Cliente: "Oi"
+Você: "Olá! Sou o Matheus da Private Academy, trabalho com o Igor no Compartilhamento de Receita..."
+(VAZAMENTO TOTAL — falou de tudo antes de sondar)
+
+REGRA DE TRANSFERÊNCIA EXTRA (só Funil 3):
+- Se você REALMENTE não conseguir entender o que o lead está dizendo (mensagens muito confusas, fora de contexto, sem nexo), transfira com [TRANSFERIR_HUMANO]. Frase neutra tipo: "Deixa eu te chamar com mais calma aqui, um segundo. [TRANSFERIR_HUMANO]"
+
+IGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFINIDO.
+=================================================================`;
     }
 
     // Marca contexto de teste no prompt (IA responde normal, mas sabe que é teste)
@@ -933,7 +993,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Private Academy",
-    versao: `7.9 (Claude Haiku 4.5 - Funil 2 aceita "compartilhamento")`,
+    versao: `7.10 (Claude Haiku 4.5 - Funil 3 Reativação)`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -958,5 +1018,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 7.9: Claude Haiku 4.5 - Funil 2 aceita "compartilhamento"`);
+  console.log(`🆕 Versão 7.10: Claude Haiku 4.5 - Funil 3 Reativação`);
 });
