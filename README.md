@@ -2,7 +2,7 @@
 
 API customizada que atua como gerente virtual da Private Academy, atendendo clientes via WhatsApp através de integração com BotConversa + Claude Haiku 4.5 (Anthropic).
 
-**Versão atual:** 7.3 (Claude Haiku 4.5 + Áudios pré-gravados Bruno/Igor/Matheus)
+**Versão atual:** 7.4 (Claude Haiku 4.5 — áudios desativados)
 
 ---
 
@@ -14,7 +14,6 @@ A IA simula um consultor humano chamado "Matheus", que:
 - ✅ Atende 2 produtos diferentes (Funil 1 + Funil 2)
 - ✅ Detecta automaticamente qual produto o lead veio buscar
 - ✅ Apresenta a Love Tradding como financeira oficial
-- ✅ Envia áudios pré-gravados em momentos estratégicos
 - ✅ Transfere para equipe comercial de forma sutil
 - ✅ Decide entre enviar 1 ou 2 mensagens conforme contexto
 
@@ -58,38 +57,7 @@ A IA simula um consultor humano chamado "Matheus", que:
 - **Saque:** liberado em até 24h após solicitação
 - **Suporte:** em português, em horário comercial
 
-⚠️ **Importante:** a IA está programada para NUNCA mencionar percentuais de comissão ou "taxas baixíssimas" (proteção CVM).
-
----
-
-## 🎤 Sistema de Áudios Pré-gravados
-
-A IA envia áudios em momentos estratégicos usando tags especiais:
-
-| Tag | Quem fala | Quando usar |
-|---|---|---|
-| `[ENVIAR_AUDIO_BRUNO_METODO]` | Bruno | Cliente pergunta sobre método de Recuperação de Banca |
-| `[ENVIAR_AUDIO_IGOR_METODO]` | Igor | Cliente pergunta sobre Alavancagem/Compartilhamento de Receita |
-| `[ENVIAR_AUDIO_MATHEUS_LOVE]` | Matheus | Cliente pergunta sobre Love Tradding ou processo de cadastro |
-
-### Fluxo do áudio
-
-```
-Cliente: "Como funciona o método?"
-       ↓
-IA responde com tag: "Vou te passar um áudio do Bruno. [ENVIAR_AUDIO_BRUNO_METODO] ||| Ouve com atenção..."
-       ↓
-API extrai a tag e retorna no JSON:
-{
-  "resposta_1": "Vou te passar um áudio do Bruno.",
-  "audio_enviar": "BRUNO_METODO",
-  "resposta_2": "Ouve com atenção..."
-}
-       ↓
-BotConversa usa Condição em cadeia pra direcionar pro áudio correto
-       ↓
-Cliente recebe: texto → áudio → texto
-```
+⚠️ **Importante:** a IA está programada para NUNCA mencionar percentuais de comissão ou "taxas baixíssimas".
 
 ---
 
@@ -213,7 +181,6 @@ Health check — retorna status e versão.
 - ✅ Proteção contra fragmentos curtos
 - ✅ Anti-vazamento de instruções internas
 - ✅ Anti-repetição de frases
-- ✅ Conformidade CVM (não promete lucro)
 
 ---
 
@@ -229,7 +196,8 @@ Health check — retorna status e versão.
 | 7.0 | Migração para Claude Haiku 4.5 (Anthropic) |
 | 7.1 | Mensagens curtas estilo WhatsApp |
 | 7.2 | Love Tradding como financeira oficial |
-| **7.3** | **Sistema de áudios pré-gravados (atual)** |
+| 7.3 | Sistema de áudios pré-gravados |
+| **7.4** | **Áudios desativados; ajustes de prompt (atual)** |
 
 ---
 
@@ -250,8 +218,8 @@ Estimativa por conversa de qualificação: ~$0.03 (R$ 0.15)
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/gestaoprivatebrasil-arte/botconversa-api.git
-cd botconversa-api
+git clone https://github.com/mathcardosorj-web/private-academy-ia.git
+cd private-academy-ia
 
 # Instalar dependências
 npm install
@@ -273,7 +241,6 @@ npm start
 | Erro 429 RateLimitError | Cota do provedor atingida, aguardar reset |
 | IA respondendo fora do funil | Verificar bloco "Ação: funil_origem" no fluxo |
 | API "dormindo" (spin down) | Render Free dorme após 15min, migrar pra Starter |
-| Cliente recebe áudio errado | Verificar se Condição está olhando audio_enviar correto |
 
 ---
 
@@ -281,4 +248,4 @@ npm start
 
 **Cliente:** Private Academy
 **Responsável técnico:** Matheus Cardoso
-**Repositório:** github.com/gestaoprivatebrasil-arte/botconversa-api
+**Repositório:** github.com/mathcardosorj-web/private-academy-ia
