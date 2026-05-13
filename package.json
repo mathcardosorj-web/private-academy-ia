@@ -1,7 +1,7 @@
 {
   "name": "api-cabeca-botconversa",
-  "version": "7.3.0",
-  "description": "API com IA Matheus para Private Academy (BotConversa + Claude Haiku 4.5 + Áudios pré-gravados)",
+  "version": "7.4.0",
+  "description": "API com IA Matheus para Private Academy (BotConversa + Claude Haiku 4.5)",
   "type": "module",
   "main": "index.js",
   "scripts": {
