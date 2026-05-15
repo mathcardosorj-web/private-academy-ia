@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Private Academy
-// Versão: 7.13 (Claude Haiku 4.5 - Funil 3 Curador-Persuasor + janelas de abertura)
+// Versão: 7.14 (Claude Haiku 4.5 - memória 12h)
 // ============================================
 
 import express from "express";
@@ -22,7 +22,7 @@ const ai = new Anthropic({
 // ============================================
 const conversas = new Map();
 const LIMITE_HISTORICO = 10;
-const EXPIRACAO_MS = 30 * 60 * 1000;
+const EXPIRACAO_MS = 12 * 60 * 60 * 1000; // 12 horas
 
 // Anti-abuse: max 30 mensagens por hora por cliente
 const RATE_LIMIT_MAX = 30;
@@ -1207,7 +1207,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Private Academy",
-    versao: `7.13 (Claude Haiku 4.5 - Funil 3 Curador-Persuasor + janelas de abertura)`,
+    versao: `7.14 (Claude Haiku 4.5 - memória 12h)`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -1232,5 +1232,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 7.13: Claude Haiku 4.5 - Funil 3 Curador-Persuasor + janelas de abertura`);
+  console.log(`🆕 Versão 7.14: Claude Haiku 4.5 - memória 12h`);
 });
