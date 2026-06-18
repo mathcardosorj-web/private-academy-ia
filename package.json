@@ -1,7 +1,7 @@
 {
   "name": "api-cabeca-botconversa",
-  "version": "7.4.0",
-  "description": "API com IA Matheus para Private Academy (BotConversa + Claude Haiku 4.5)",
+  "version": "8.2.3",
+  "description": "API IA para BotConversa - Rocket Class + Nexus Academy (Claude Haiku 4.5)",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,9 @@
     "dev": "node --watch index.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.1",
+    "@anthropic-ai/sdk": "^0.65.0",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "openai": "^4.67.3"
+    "express": "^4.21.0"
   },
   "engines": {
     "node": ">=18.0.0"
