@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Rocket Class / Nexus Academy (multi-funil)
-// Versão: 8.2.2 (retry em ERR_STREAM_PREMATURE_CLOSE + anti-vazamento)
+// Versão: 8.2.3 (SDK Anthropic atualizado + retry em PREMATURE_CLOSE)
 // ============================================
 
 import express from "express";
@@ -1599,7 +1599,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Rocket Class / Nexus Academy",
-    versao: `8.2.2 (retry em ERR_STREAM_PREMATURE_CLOSE + anti-vazamento)`,
+    versao: `8.2.3 (SDK Anthropic atualizado + retry em PREMATURE_CLOSE)`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
