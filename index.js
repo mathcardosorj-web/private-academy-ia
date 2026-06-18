@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Rocket Class / Nexus Academy (multi-funil)
-// Versão: 8.2.3 (SDK Anthropic atualizado + retry em PREMATURE_CLOSE)
+// Versão: 8.3 (debounce 10s + anti-divisor + SDK Anthropic atualizado)
 // ============================================
 
 import express from "express";
@@ -28,6 +28,13 @@ const EXPIRACAO_MS = 12 * 60 * 60 * 1000; // 12 horas
 const RATE_LIMIT_MAX = 30;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const rateLimitClientes = new Map();
+
+// ============================================
+// DEBOUNCE - juntar mensagens picotadas
+// ============================================
+const DEBOUNCE_MS = 10 * 1000; // 10 segundos
+// Estrutura: { mensagens: [], timer: setTimeout, resolve: Promise.resolve, dados: { req body original } }
+const debounceMap = new Map();
 
 // ============================================
 // NÚMEROS DE TESTE
@@ -334,13 +341,18 @@ Você está conversando com um cliente real no WhatsApp.
 ❌ "MISSÃO NO FUNIL"
 ❌ "PROIBIÇÕES ABSOLUTAS"
 ❌ "MEMÓRIA — NÃO REPITA"
-❌ Cabeçalhos com símbolos: =, v, -, |, , , , 
+❌ DIVISORES de qualquer tipo: ---, ***, ___, ====, ----, ......, ===, +++ (NUNCA use traços, asteriscos ou outros símbolos repetidos como separadores)
+❌ Cabeçalhos com símbolos visuais
 ❌ Cabeçalhos com # ## ### no início de linha (Markdown headers)
-❌ Listas com 🎯 🚨 ⚠️ 💾 🔤 🚫 ✅ ❌ no início (emojis de instrução)
+❌ Listas com emojis de instrução (🎯 🚨 ⚠️ 💾 🔤 🚫 ✅ ❌) no início
 ❌ Formato "X: valor / Y: valor" (estilo de dados/template)
 ❌ "EXEMPLO BOM:", "EXEMPLO RUIM:", "EXEMPLO ERRADO:", "EXEMPLO CERTO:"
 ❌ "REGRA DE OURO", "REGRA CRÍTICA"
 ❌ Qualquer texto que pareça documentação, manual ou instrução interna
+
+## SOBRE OS "---" QUE VOCÊ ANDA COLOCANDO
+Você tem usado "---" pra separar partes da resposta. PARE. WhatsApp NÃO é Markdown.
+Cliente vê os "---" como traços estranhos no meio da conversa. Suas mensagens devem ser PROSA NATURAL, sem divisores visuais. Quando precisar separar 2 partes, use o separador "|||" (que vira 2 mensagens) ou simplesmente quebra de linha natural.
 
 ## REGRA GERAL
 
@@ -881,7 +893,8 @@ app.post("/chat", async (req, res) => {
   const inicioRequest = Date.now();
 
   try {
-    const { cliente_id, mensagem, nome_cliente, funil_origem } = req.body;
+    const { cliente_id, nome_cliente, funil_origem } = req.body;
+    let mensagem = req.body.mensagem;
 
     if (!cliente_id || !mensagem) {
       return res.status(400).json({
@@ -905,6 +918,57 @@ app.post("/chat", async (req, res) => {
     if (funil_origem) {
       console.log(`[${new Date().toISOString()}] >>> Funil de origem: ${funil_origem}`);
     }
+
+    // ============================================
+    // DEBOUNCE - junta mensagens picotadas (10s)
+    // ============================================
+    // Estratégia: aguarda 10s antes de processar. Se cliente mandar nova msg nesse
+    // intervalo, esta request é descartada e a nova assume o trabalho.
+    const estadoAnterior = debounceMap.get(cliente_id);
+    if (estadoAnterior) {
+      // Já tem espera ativa: acumula mensagem e cancela timer antigo
+      estadoAnterior.mensagens.push(mensagem);
+      clearTimeout(estadoAnterior.timer);
+      console.log(`[${new Date().toISOString()}] 🕐 DEBOUNCE: nova msg (${estadoAnterior.mensagens.length}ª), resetando timer`);
+      // Marca a request anterior pra responder vazio
+      estadoAnterior.descartada = true;
+    }
+
+    // Cria/atualiza estado pra esta request
+    const meuEstado = {
+      mensagens: estadoAnterior ? estadoAnterior.mensagens : [mensagem],
+      descartada: false,
+      timer: null,
+    };
+    debounceMap.set(cliente_id, meuEstado);
+
+    // Aguarda DEBOUNCE_MS — se chegar outra msg, esta vai ser marcada como descartada
+    await new Promise((resolve) => {
+      meuEstado.timer = setTimeout(resolve, DEBOUNCE_MS);
+    });
+
+    // Se fui descartada (chegou outra msg mais recente), respondo vazio
+    if (meuEstado.descartada) {
+      console.log(`[${new Date().toISOString()}] 🕐 DEBOUNCE: request descartada, outra request mais recente assumiu`);
+      return res.json({
+        resposta_1: "",
+        resposta_2: "",
+        resposta: "",
+        transferir_humano: false,
+        tem_segunda_parte: false,
+      });
+    }
+
+    // Sou a "vencedora": processo a mensagem consolidada
+    const mensagemConsolidada = meuEstado.mensagens.join(" ");
+    debounceMap.delete(cliente_id); // Limpa estado
+
+    if (meuEstado.mensagens.length > 1) {
+      console.log(`[${new Date().toISOString()}] 🕐 DEBOUNCE FINALIZADO: ${meuEstado.mensagens.length} msgs juntadas → "${mensagemConsolidada}"`);
+    }
+
+    // ATUALIZA a variável "mensagem" pra usar a consolidada daqui pra frente
+    mensagem = mensagemConsolidada;
 
     // Detecta se é número de teste (loga e marca pro prompt)
     const ehTeste = ehNumeroTeste(cliente_id);
@@ -1509,8 +1573,17 @@ IGNORE a regra de 'detectar funil pela mensagem' — você JÁ TEM O FUNIL DEFIN
     let audioEnviar = "";
 
     // Limpa tag de transferência do texto que vai pro cliente
-    const respostaLimpa = textoResposta
+    let respostaLimpa = textoResposta
       .replace("[TRANSFERIR_HUMANO]", "")
+      .trim();
+
+    // Limpa divisores Markdown que a IA possa ter colocado por engano
+    // (---, ***, ___, ====, etc no início de linha)
+    respostaLimpa = respostaLimpa
+      .split("\n")
+      .filter(linha => !/^[-*_=+]{3,}\s*$/.test(linha.trim()))
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n") // colapsa quebras de linha múltiplas
       .trim();
 
     const partes = respostaLimpa.split("|||").map(p => p.trim()).filter(p => p.length > 0);
@@ -1599,7 +1672,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Rocket Class / Nexus Academy",
-    versao: `8.2.3 (SDK Anthropic atualizado + retry em PREMATURE_CLOSE)`,
+    versao: `8.3 (debounce 10s + anti-divisor + SDK Anthropic atualizado)`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
