@@ -1275,5 +1275,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 8.1: Pedro/Rocket Class + Rafael/Nexus Academy + sem saudação`);
+  console.log(`🆕 Versão 8.4: mais direto e enxuto + Funil 3 removido`);
 });
