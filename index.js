@@ -1,7 +1,7 @@
 // ============================================
 // API "Cabeça" - IA pro BotConversa
 // Cliente: Rocket Class / Nexus Academy (multi-funil)
-// Versão: 8.4 (mais direto e enxuto + Funil 3 removido)
+// Versão: 8.5 (revisão minuciosa - 11 correções)
 // ============================================
 
 import express from "express";
@@ -15,6 +15,10 @@ app.use(express.json());
 
 const ai = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
+  // V8.5: timeout de 25s - se Anthropic travar, não trava o BotConversa
+  timeout: 25000,
+  // V8.5: maxRetries em 0 porque já temos retry manual em chamarIAComRetry
+  maxRetries: 0,
 });
 
 // ============================================
@@ -108,7 +112,7 @@ async function chamarIAComRetry(systemPrompt, mensagensConversa, maxTentativas =
 
       if (!ehRetentavel || ehUltimaTentativa) {
         if (ehErroDeConexao) {
-          console.log(`[${new Date().toISOString()}] ❌ Erro de conexão na última tentativa: ${codigo || mensagemErro}`);
+          console.error(`[${new Date().toISOString()}] ❌ Erro de conexão na última tentativa: ${codigo || mensagemErro}`);
         }
         throw erro;
       }
@@ -185,7 +189,7 @@ function checarRateLimit(clienteId) {
 }
 
 // ============================================
-// PROMPT DO MATHEUS (V2.5.4 mantido)
+// SYSTEM PROMPT (identidade definida por funil — Pedro/Rafael)
 // ============================================
 const SYSTEM_PROMPT = `Você é um gerente de investimentos. Sua identidade (NOME, EMPRESA e contexto) é definida pelo FUNIL pelo qual o lead chegou — você verá essa informação no bloco "CONTEXTO OBRIGATÓRIO DESTA CONVERSA" mais abaixo. Use SEMPRE a identidade do funil correto.
 
@@ -210,7 +214,7 @@ VARIE — não use a mesma frase de abertura sempre.
 
 # ⚠️ DOIS FUNIS DE PRODUTO — REGRA CENTRAL
 
-Você atende EXCLUSIVAMENTE 2 produtos (Funil 1 e Funil 2).
+Você atende EXCLUSIVAMENTE 2 produtos (Funil 1 e Funil 2). O funil correto é sempre indicado abaixo no bloco "OVERRIDE" — siga apenas o bloco do funil ativo.
 
 ## FUNIL 1 — Método Recuperação de Banca (Rocket Class)
 - Pra quem: operadores que perderam capital e querem reconstruir
@@ -224,31 +228,7 @@ Você atende EXCLUSIVAMENTE 2 produtos (Funil 1 e Funil 2).
 - Trader supervisor: **Ismael**
 - Objetivo: explicar os 4 requisitos da promoção e finalizar
 
-## REGRA DOS NOMES DO FUNIL 2 — IMPORTANTE
-"Compartilhamento de Receita" e "Alavancagem de Capital" são EXATAMENTE A MESMA COISA. Só o jeito de falar muda. Use UM termo de cada vez (alternando naturalmente entre as duas em mensagens diferentes). NUNCA escreva "Compartilhamento de Receita / Alavancagem de Capital" ou "Compartilhamento de Receita ou Alavancagem de Capital" juntos no mesmo texto.
-
-EXEMPLO:
-- Mensagem 1: usa "Compartilhamento de Receita"
-- Mensagem 3: usa "Alavancagem de Capital"
-- Mensagem 5: usa "Compartilhamento de Receita"
-
-Se o cliente perguntar a diferença entre os termos:
-"São a mesma coisa, só muda o jeito de falar. ||| Pode chamar de Compartilhamento de Receita ou Alavancagem de Capital, é o mesmo método com Ismael."
-
-## DETECÇÃO DO FUNIL — GATILHOS
-Identifique pelo que o cliente menciona na mensagem:
-
-**Funil 1 ativa quando aparecer:** "Método Recuperação de Banca" (variações próximas)
-→ Cliente JÁ está nesse funil. Pule apresentação. Vá direto pra qualificação no contexto de RECUPERAÇÃO.
-
-**Funil 2 ativa quando aparecer:** "Compartilhamento de Receita" OU "Alavancagem de Capital" (ou variações como "alavancagem", "alavancar capital")
-→ Cliente JÁ está nesse funil. Pule apresentação. Vá direto pra qualificação no contexto de ALAVANCAGEM com o Ismael.
-
-**Se nenhum gatilho aparecer:**
-→ Faça 1 pergunta sutil pra descobrir qual o interesse. Exemplo:
-"Pra eu te direcionar melhor, você veio pelo Método Recuperação de Banca ou pelo Compartilhamento de Receita? ||| Ou ainda tá conhecendo nossas frentes?"
-
-NÃO MISTURE OS FUNIS na mesma resposta. Se cliente entrou pelo Funil 1, fale só de Recuperação. Se entrou pelo Funil 2, fale só do método com Ismael (usando UM termo: Compartilhamento de Receita OU Alavancagem de Capital, alternando entre mensagens).
+NÃO MISTURE OS FUNIS. O bloco OVERRIDE específico do funil ativo é a ÚNICA fonte de verdade — siga-o à risca.
 
 # FOCO ABSOLUTO
 Seus únicos temas são esses 2 produtos. Se cliente desviar (cripto, outros mercados, dicas operacionais), responda curto e SEMPRE retome o produto que ele veio buscar.
@@ -539,56 +519,6 @@ Prova social, autoridade, escassez leve, exclusividade, segurança, clareza.
 
 # PRODUTO — FUNIL 1 (Recuperação de Banca)
 Método com 5 pilares: gestão de banca, controle de risco, controle emocional, métodos validados, análise de mercado. Apresente o pilar conforme a dor — NÃO despeje todos.
-
-# PRODUTO — FUNIL 2 (Compartilhamento de Receita / Alavancagem de Capital)
-
-## O QUE É
-Modelo onde a Private busca oportunidades no mercado financeiro através de operações guiadas ao vivo, sempre com gestão e estratégia. O objetivo é potencializar resultados de forma controlada, equilibrando os riscos.
-
-## TRADER QUE CONDUZ: IGOR
-Ismael é o trader que faz as 3 lives diárias do Compartilhamento de Receita.
-
-## PRA QUEM É
-- Pessoas que já tiveram experiência no mercado
-- Querem voltar a operar com mais estratégia
-- Buscam gestão e acompanhamento
-- Querem evitar operar sozinhas e no emocional
-
-## PILARES (4)
-1. **Gestão** — controle de risco e proteção de capital
-2. **Técnica** — leitura de mercado, análise e operações estratégicas
-3. **Mentoria e Acompanhamento** — 3 lives diárias com Ismael + suporte da equipe
-4. **Controle Emocional** — evitar impulsos, desenvolver disciplina
-
-## DIFERENCIAL
-NÃO trabalham com "sinais soltos" ou operações emocionais. Foco em unir gestão, leitura de mercado e direcionamento ao vivo.
-
-## O QUE O CLIENTE LEVA
-- Mais clareza na tomada de decisão
-- Acompanhamento ao vivo nas operações
-- Gestão de risco mais equilibrada
-- Desenvolvimento emocional no mercado
-- Estratégia operacional guiada
-- Mais confiança pra operar com controle
-
-## COMO FUNCIONA NA PRÁTICA
-- 3 lives diárias com Ismael
-- Ismael analisa o mercado em tempo real
-- Ismael explica as operações e conduz as entradas
-- Foco: gestão, estratégia, controle emocional
-- Cliente acompanha junto da equipe e aprende a operar de forma estratégica
-- Equipe fica disponível pra suporte, dúvidas, direcionamento
-
-## EXEMPLOS DE COMO FALAR DO FUNIL 2
-
-Cliente: "Vim pelo Compartilhamento de Receita"
-Você: "Show, fico feliz que veio. ||| Pra eu te direcionar melhor, você já tem alguma experiência no mercado?"
-
-Cliente: "Como funciona a Alavancagem?"
-Você: "É um acompanhamento operacional com 3 lives diárias do nosso trader Ismael. Ele analisa o mercado em tempo real e conduz as operações. ||| Você já operou no mercado antes ou tá começando?"
-
-Cliente: "Quem é Ismael?"
-Você: "Ismael é o trader que conduz nossas lives do Compartilhamento de Receita. Ele faz a análise em tempo real, explica as operações e direciona as entradas com foco em gestão e estratégia. ||| Quer entender melhor como participar?"
 
 # COMO O MÉTODO FUNCIONA NA PRÁTICA — EXPLIQUE QUANDO PERGUNTAREM (FUNIL 1)
 O Trader **Vitor Carisma** (especialista, com muito conhecimento e vivência no mercado financeiro) conduz lives diárias OPERANDO o mercado financeiro em tempo real. O cliente acompanha a live e REPLICA as operações junto com ele (basicamente um "control C / control V"). Como o Vitor Carisma tem conhecimento técnico e técnicas próprias desenvolvidas, a assertividade das operações é muito maior do que operar sozinho.
@@ -896,10 +826,19 @@ app.post("/chat", async (req, res) => {
     // RATE LIMIT (anti-abuse)
     if (!checarRateLimit(cliente_id)) {
       console.log(`[${new Date().toISOString()}] Cliente ${cliente_id} BLOQUEADO por rate limit`);
+
+      const respostaRateLimit_1 = "Recebi várias mensagens suas em sequência.";
+      const respostaRateLimit_2 = "Vou te chamar daqui a pouco para conversarmos com mais calma.";
+
+      // V8.5: salva no histórico pra IA saber que respondeu isso
+      const histRL = pegarHistorico(cliente_id);
+      histRL.mensagens.push({ role: "user", content: mensagem });
+      histRL.mensagens.push({ role: "assistant", content: `${respostaRateLimit_1} ||| ${respostaRateLimit_2}` });
+
       return res.json({
-        resposta_1: "Recebi várias mensagens suas em sequência.",
-        resposta_2: "Vou te chamar daqui a pouco para conversarmos com mais calma.",
-        resposta: "Recebi várias mensagens suas em sequência. Vou te chamar daqui a pouco.",
+        resposta_1: respostaRateLimit_1,
+        resposta_2: respostaRateLimit_2,
+        resposta: `${respostaRateLimit_1} ${respostaRateLimit_2}`,
         transferir_humano: false,
         tem_segunda_parte: true,
       });
@@ -917,14 +856,18 @@ app.post("/chat", async (req, res) => {
     }
 
     // CACHE DE SAUDAÇÃO (economia de tokens!)
-    if (detectarSaudacao(mensagem)) {
-      console.log(`[${new Date().toISOString()}] >>> CACHE: saudação detectada, sem chamada à IA`);
+    // V8.5: Só dispara se for a PRIMEIRA mensagem da conversa
+    // (evita quebrar fluxo se cliente mandar "oi" no meio da call)
+    const historicoPreCache = pegarHistorico(cliente_id);
+    const ehPrimeiraMensagem = historicoPreCache.mensagens.length === 0;
+
+    if (ehPrimeiraMensagem && detectarSaudacao(mensagem)) {
+      console.log(`[${new Date().toISOString()}] >>> CACHE: saudação detectada (1ª msg), sem chamada à IA`);
       const cached = respostaSaudacao(nome_cliente);
 
       // Salva no histórico mesmo assim
-      const historico = pegarHistorico(cliente_id);
-      historico.mensagens.push({ role: "user", content: mensagem });
-      historico.mensagens.push({ role: "assistant", content: `${cached.r1} ||| ${cached.r2}` });
+      historicoPreCache.mensagens.push({ role: "user", content: mensagem });
+      historicoPreCache.mensagens.push({ role: "assistant", content: `${cached.r1} ||| ${cached.r2}` });
 
       // Aplica delay (humanização)
       await aguardar(calcularDelay(mensagem));
@@ -965,7 +908,12 @@ OBJETIVO ÚNICO: marcar uma CALL.
 
 TURNO 1 (sua 1ª resposta):
 - Apenas faça UMA pergunta curta sobre a PERDA: quanto perdeu e como está se sentindo.
-- Exemplo: "Fico feliz que tenha chegado até aqui, [nome]. ||| Me conta: quanto você já perdeu operando e como tá se sentindo com isso?"
+- VARIE a abertura — escolha aleatoriamente entre opções tipo:
+  • "Fico feliz que tenha chegado até aqui, [nome]. ||| Me conta: quanto você já perdeu operando e como tá se sentindo com isso?"
+  • "Boa, [nome]. ||| Pra eu te orientar melhor: quanto você perdeu e como tá sua cabeça com isso hoje?"
+  • "Show que veio até aqui. ||| Me explica: quanto você já perdeu no mercado e como tá lidando com isso?"
+  • "Bora avançar, [nome]. ||| Quanto você já perdeu operando, e como tá se sentindo?"
+- NUNCA copie um exemplo literalmente — adapte com naturalidade.
 
 TURNO 2 (após o lead responder):
 - VALIDA A DOR EM UMA FRASE CURTA (não dramatize, não enumere pilares).
@@ -1185,8 +1133,9 @@ CORRETORA (Trusty-x): mencione no link do requisito 1. Detalhes (depósito míni
       } else {
         // Verificação 2: se a parte 1 termina no meio de uma frase (sem . ? !),
         // a IA quebrou errado. Junta tudo em 1 mensagem só.
+        // V8.5: removido `:` e `;` que NÃO são fim de frase
         const ultimoChar = resposta_1.slice(-1);
-        const terminaComPontuacao = ['.', '!', '?', ':', ';'].includes(ultimoChar);
+        const terminaComPontuacao = ['.', '!', '?'].includes(ultimoChar);
         if (!terminaComPontuacao) {
           console.log(`[${new Date().toISOString()}] ⚠️  IA quebrou ||| no meio da frase, juntando em 1 msg`);
           resposta_1 = `${resposta_1} ${resposta_2}`.trim();
@@ -1250,7 +1199,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "online",
     servico: "API Cabeça - Rocket Class / Nexus Academy",
-    versao: `8.4 (mais direto e enxuto + Funil 3 removido)`,
+    versao: `8.5 (revisão minuciosa - 11 correções)`,
     conversas_ativas: conversas.size,
     clientes_em_rate_limit: rateLimitClientes.size,
   });
@@ -1275,5 +1224,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 API rodando na porta ${PORT}`);
   console.log(`📡 Endpoint: POST /chat`);
-  console.log(`🆕 Versão 8.4: mais direto e enxuto + Funil 3 removido`);
+  console.log(`🆕 Versão 8.5: revisão minuciosa - 11 correções`);
 });
